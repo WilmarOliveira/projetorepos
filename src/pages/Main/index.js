@@ -1,9 +1,13 @@
 import React from 'react';
 
+import { Title } from './styles';
+
 function Main() {
   return(
     <div>
-      <h1>Página Main</h1>
+      <Title>
+        Main
+      </Title>
     </div>
   );
 }
