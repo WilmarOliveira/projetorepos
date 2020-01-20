@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { FaGithub, FaPlus } from 'react-icons/fa'
+import { FaGithub, FaPlus, FaSpinner } from 'react-icons/fa'
 import { Container, Form, SubmitButton } from './styles';
 
 import api from '../../services/api';
@@ -8,6 +8,7 @@ function Main() {
 
   const [newRepo, setNewRepo] = useState('');
   const [repositorios, setRepositorios] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   function handleInputChange(e) {
     setNewRepo(e.target.value);
@@ -18,15 +19,23 @@ function Main() {
 
     async function submit() {
 
-      const response = await api.get(`repos/${newRepo}`);
+      setLoading(true);
+      try{
 
-      const data = {
-        name: response.data.full_name
+        const response = await api.get(`repos/${newRepo}`);
+
+        const data = {
+          name: response.data.full_name
+        }
+
+        setRepositorios([...repositorios, data]);
+        setNewRepo('');
+
+      }catch(erro) {
+        console.log(erro);
+      }finally {
+        setLoading(false);
       }
-
-      setRepositorios([...repositorios, data]);
-
-      setNewRepo('');
     }
 
     submit();
@@ -44,8 +53,13 @@ function Main() {
       <Form onSubmit={handleSubmit} >
         <input type="text" placeholder="Adicionar Repositórios" value={newRepo} onChange={handleInputChange} />
 
-        <SubmitButton>
-          <FaPlus size={14} />
+        <SubmitButton loading={loading ? 1 : 0} >
+          
+          {loading ? 
+          <FaSpinner size={14} /> 
+          : 
+          <FaPlus size={14} />}
+
         </SubmitButton>
       </Form>
 
