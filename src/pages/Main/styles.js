@@ -15,6 +15,12 @@ export const Container = styled.div`
         flex-direction: column;
         align-items: center;
     }
+
+    h4 {
+        text-align: center;
+        font-size: 10px;
+        margin-top: 20px;
+    }
 `;
 
 export const Form = styled.form`
@@ -25,7 +31,7 @@ export const Form = styled.form`
     input {
         flex: 1;
         max-width: 100%;
-        border: 1px solid #808080;
+        border: 1px solid ${props => props.error ? '#ff0000' : '#808080'};
         padding: 5px 10px;
         border-radius: 5px;
         font-size: 14px;

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FaGithub, FaPlus, FaSpinner, FaBars, FaTrash } from 'react-icons/fa'
 import { Container, Form, SubmitButton, List, DeleteButton } from './styles';
 
@@ -9,9 +9,25 @@ function Main() {
   const [newRepo, setNewRepo] = useState('');
   const [repositorios, setRepositorios] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  //Buscar
+  useEffect(() => {
+    const repoStorage = localStorage.getItem('repos');
+
+    if(repoStorage) {
+      setRepositorios(JSON.parse(repoStorage));
+    }
+  } , [])
+
+  //Salvar Alterações
+  useEffect(() => {
+    localStorage.setItem('repos', JSON.stringify(repositorios));
+  } , [repositorios]);
 
   function handleInputChange(e) {
     setNewRepo(e.target.value);
+    setErrorMessage(null);
   }
 
   const handleDelete = useCallback((repo) => {
@@ -23,11 +39,23 @@ function Main() {
     e.preventDefault();
 
     async function submit() {
-
       setLoading(true);
+      setErrorMessage(null);
       try{
 
+        if(newRepo === '') {
+          setErrorMessage('"Por favor, adicione um repositório"')
+          throw new Error('Repositório vazio!');
+        }
+
         const response = await api.get(`repos/${newRepo}`);
+
+        const hasRepo = repositorios.find(repo => repo.name === newRepo);
+
+        if(hasRepo) {
+          setErrorMessage('"Este repositório já foi adicionado na lista de repositórios"')
+          throw new Error('Repositório duplicado!');
+        }
 
         const data = {
           name: response.data.full_name
@@ -35,6 +63,7 @@ function Main() {
 
         setRepositorios([...repositorios, data]);
         setNewRepo('');
+
 
       }catch(erro) {
         console.log(erro);
@@ -55,7 +84,9 @@ function Main() {
         Meus Repositórios
       </h1>
 
-      <Form onSubmit={handleSubmit} >
+      {errorMessage && <h4>{errorMessage}</h4>}
+
+      <Form onSubmit={handleSubmit} error={errorMessage} >
         <input type="text" placeholder="Adicionar Repositórios" value={newRepo} onChange={handleInputChange} />
 
         <SubmitButton loading={loading ? 1 : 0} >
