@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
-import { Container, Owner, Loading, BackButton, IssuesList, PageActions } from './styles';
+import { Container, Owner, Loading, BackButton, IssuesList, PageActions, SelectionState } from './styles';
 import { FaArrowLeft } from 'react-icons/fa'
 
 function Repositorio({match}) {
@@ -9,6 +9,12 @@ function Repositorio({match}) {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState([
+    {state: 'all', label: 'Todas', active: true},
+    {state: 'open', label: 'Abertas', active: false},
+    {state: 'closed', label: 'Fechadas', active: false},
+  ])
+  const [filterIndex, setFilterIndex] = useState(0);
 
   useEffect(() => {
 
@@ -19,7 +25,7 @@ function Repositorio({match}) {
         api.get(`/repos/${nomeRepo}`),
         api.get(`/repos/${nomeRepo}/issues` , {
           params: {
-            state: 'open',
+            state: filters.find(f => f.active).state,
             per_page: 5
           }
         })
@@ -34,7 +40,7 @@ function Repositorio({match}) {
 
     load();
     
-  },[match.params.repositorio]);
+  },[filters, match.params.repositorio]);
 
   useEffect(() => {
     
@@ -43,7 +49,7 @@ function Repositorio({match}) {
       const nomeRepo = decodeURIComponent(match.params.repositorio);
       const response = await api.get(`/repos/${nomeRepo}/issues` , {
         params: {
-          state: 'open',
+          state: filters[filterIndex].state,
           page,
           per_page: 5
         }
@@ -55,12 +61,16 @@ function Repositorio({match}) {
 
     loadIssues();
 
-  } , [match.params.repositorio, page]);
+  } , [filters, filterIndex, match.params.repositorio, page]);
 
   function handlePage(action) {
     
     setPage(action === 'previous' ? page - 1 : page + 1);
 
+  }
+
+  function handleFilter(index) {
+    setFilterIndex(index);
   }
 
   if(loading) {
@@ -69,7 +79,6 @@ function Repositorio({match}) {
         <h1>Carregando...</h1>
       </Loading>
     );
-    
   }
 
 
@@ -84,6 +93,14 @@ function Repositorio({match}) {
         <h1>{repositorios.name}</h1>
         <p>{repositorios.description}</p>
       </Owner>
+
+      <SelectionState active={filterIndex}>
+        
+          {filters.map((filter, index) => (
+            <button key={filter.label} onClick={() => handleFilter(index) } >{filter.label}</button>
+          ))}
+        
+      </SelectionState>
 
       <IssuesList>
         {issues.map(issue => (

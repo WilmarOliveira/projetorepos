@@ -127,3 +127,29 @@ export const PageActions = styled.div`
     }
 
 `;
+
+export const SelectionState = styled.div`
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
+    
+    button {
+
+        border: 1px solid #000;
+        border-radius: 4px;
+        background: #ddd;
+        color: #000;
+        padding: 4px;
+        margin: 0 3px;
+
+        &:nth-child(${props => props.active + 1}) {
+        background: #0071db;
+        color: #fff;
+        }
+    }
+
+    
+`;
