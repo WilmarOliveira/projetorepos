@@ -64,14 +64,14 @@ function Repositorio({match}) {
             
             <div>
               <strong>
-                <a href={issue.user.html_url} >{issue.title}</a>
+                <a href={issue.html_url} >{issue.title}</a>
 
                 {issue.labels.map(label => (
                   <span key={String(label.id)} >{label.name}</span>
                 ))}
               </strong>
 
-              <p>{issue.user.login}</p>
+              <p>By: {issue.user.login}</p>
             </div>
             
           </li>
