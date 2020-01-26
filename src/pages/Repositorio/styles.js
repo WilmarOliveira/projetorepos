@@ -49,3 +49,5 @@ export const BackButton = styled(Link)`
         color: #0D2636;
     }
 `;
+
+export const IssuesList = styled.ul``;
